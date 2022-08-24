@@ -26,6 +26,6 @@ fn spawn_app() -> String {
     // using tokio spawn to return a handle of a future
     let _ = tokio::spawn(server);
 
-    //return the port to be used in the response check
+    //return the address with the randomly assigned port to be used in the response check
     format!("http://127.0.0.1:{port}")
 }

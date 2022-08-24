@@ -3,7 +3,7 @@ use actix_web::{web, App, HttpResponse, HttpServer};
 use std::net::TcpListener;
 
 #[derive(serde::Deserialize)]
-struct FormData {
+pub struct FormData {
     email: String,
     name: String,
 }

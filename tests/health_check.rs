@@ -23,7 +23,7 @@ async fn spawn_app() -> TestApp {
     // App/server setup
     let server =
         zero2prod::startup::run(listener, connection_pool.clone()).expect("Failed to bind address");
-    // launcing the server as a background task
+    // launching the server as a background task
     // using tokio spawn to return a handle of a future
     let _ = tokio::spawn(server);
 

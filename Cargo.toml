@@ -37,6 +37,7 @@ log = "0.4"
 
 #tracing
 tracing = { version = "0.1", features = ["log"] }
+tracing-subscriber = { version = "0.3", features = ["registry", "env-filter"] }
 
 # Using table-like toml syntax to avoid a super-long line!
 [dependencies.sqlx]

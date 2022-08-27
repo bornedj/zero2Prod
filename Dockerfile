@@ -12,4 +12,5 @@ ENV SQLX_OFFLINE true
 #build binary
 RUN cargo build --release
 # run release binary
+ENV APP_ENVIRONMENT production
 ENTRYPOINT ["./target/release/zero2prod"]

@@ -12,7 +12,7 @@ use tracing_subscriber::{fmt::MakeWriter, layer::SubscriberExt, EnvFilter, Regis
 /// spell out the actual type of the returned subscriber, which is
 /// indeed quite complex.
 /// We need to explicitly call out that the returned subscriber is
-/// `Send` and
+/// `Send` and `Sync`
 pub fn get_subscriber<Sink>(
     name: String,
     env_filter: String,

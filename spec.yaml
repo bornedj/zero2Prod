@@ -1,11 +1,5 @@
 #! spec.yaml
 name: zero2prod
-# Check https://www.digitalocean.com/docs/app-platform/#regional-availability
-# for a list of all the available options.
-# You can get region slugs from
-# https://www.digitalocean.com/docs/platform/availability-matrix/
-# They must specified lowercased.
-# `fra` stands for Frankfurt (Germany - EU)
 region: nyc1
 services:
   - name: zero2prod
@@ -17,10 +11,7 @@ services:
       # the default branch on GitHub might have been named `master`
       branch: main
       # Deploy a new version on every commit to `main`!
-      # Continuous Deployment, here we come!
       deploy_on_push: true
-      # !!! Fill in with your details
-      # e.g. LukeMathWalker/zero-to-production
       repo: bornedj/zero2prod
     # Active probe used by DigitalOcean's to ensure our application is healthy
     health_check:

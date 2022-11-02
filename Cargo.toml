@@ -23,6 +23,7 @@ reqwest = "0.11"
 
 # serialization (de)
 serde = { version = "1", features = ["derive"]}
+serde-aux = "3"
 
 # setup the database on config yaml
 config = "0.13"

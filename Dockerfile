@@ -24,6 +24,8 @@ ENV SQLX_OFFLINE true
 RUN cargo build --release --bin zero2prod
 # run release binary
 
+EXPOSE 8000
+
 #runtime
 FROM debian:bullseye-slim AS runtime
 WORKDIR /app

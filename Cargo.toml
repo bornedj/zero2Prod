@@ -32,8 +32,9 @@ config = "0.13"
 uuid = { version = "1", features = ["v4"] }
 chrono = "0.4.15"
 
-#unicode segmentation for subscriber validation
+#subscriber validation
 unicode-segmentation = "1"
+validator = "0.14"
 
 #tracing
 tracing = { version = "0.1", features = ["log"] }
@@ -57,3 +58,8 @@ features = [
 "migrate",
 "offline",
 ]
+
+[dev-dependencies]
+claim = "0.5"
+#fake for creating fake data for testing
+fake = "~2.3"

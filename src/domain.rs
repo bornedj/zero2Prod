@@ -15,4 +15,13 @@ impl SubscriberName {
             Self(s)
         }
     }
+
+    pub fn inner_ref(&self) -> &str {
+        &self.0
+    }
+}
+
+pub struct NewSubscriber {
+    pub email: String,
+    pub name: SubscriberName,
 }

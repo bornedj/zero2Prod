@@ -32,6 +32,9 @@ config = "0.13"
 uuid = { version = "1", features = ["v4"] }
 chrono = "0.4.15"
 
+#unicode segmentation for subscriber validation
+unicode-segmentation = "1"
+
 #tracing
 tracing = { version = "0.1", features = ["log"] }
 tracing-subscriber = { version = "0.3", features = ["registry", "env-filter"] }

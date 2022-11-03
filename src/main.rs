@@ -23,6 +23,7 @@ async fn main() -> std::io::Result<()> {
     );
 
     // building the email client
+    let timeout = configuration.email_client.timeout();
     let sender_email = configuration
         .email_client
         .sender()
@@ -31,6 +32,7 @@ async fn main() -> std::io::Result<()> {
         configuration.email_client.base_url,
         sender_email,
         configuration.email_client.authorization_token,
+        timeout,
     );
     let listener = TcpListener::bind(address).expect("Failed to bind to random port.");
     run(listener, connection_pool, email_client)?.await

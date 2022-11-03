@@ -20,6 +20,9 @@ pub struct FormData {
     )
 )]
 pub async fn subscribe(form: web::Form<FormData>, pool: web::Data<PgPool>) -> HttpResponse {
+    if !is_valid_name(&form.name) {
+        return HttpResponse::BadRequest().finish();
+    }
     // run insert query
     match insert_subscriber(&pool, &form).await {
         Ok(_) => HttpResponse::Ok().finish(),

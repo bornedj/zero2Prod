@@ -3,18 +3,10 @@ use crate::utils::spawn_app;
 async fn subscribe_returns_200_for_valid_form_data() {
     // setup
     let app = spawn_app().await;
-    let client = reqwest::Client::new();
 
     // act
     let body = "name=daniel%20borne&email=danielborne%40gmail.com";
-    let response = client
-        .post(&format!("{}/subscriptions", &app.address))
-        .header("Content-Type", "application/x-www-form-urlencoded")
-        .body(body)
-        .send()
-        .await
-        .expect("Failed to execute request.");
-
+    let response = app.post_subscriptions(body.into()).await;
     // Assert response is correct
     assert_eq!(200, response.status().as_u16());
     // Assert database record written
@@ -31,7 +23,6 @@ async fn subscribe_returns_200_for_valid_form_data() {
 async fn subscribe_returns_400_when_data_is_missing() {
     // setup
     let app = spawn_app().await;
-    let client = reqwest::Client::new();
     let test_cases = vec![
         ("name=le%20guin", "missing the email"),
         ("email=ursula_le_guin%40gmail.com", "missing the name"),
@@ -40,14 +31,7 @@ async fn subscribe_returns_400_when_data_is_missing() {
 
     // iterate through the tupes in test cases
     for (invalid_body, error_message) in test_cases {
-        let response = client
-            .post(&format!("{}/subscriptions", &app.address))
-            .header("Content-Type", "application/x-www-form-urlencoded")
-            .body(invalid_body)
-            .send()
-            .await
-            .expect("Failed to execute request");
-
+        let response = app.post_subscriptions(invalid_body.into()).await;
         // Assert response correct
         assert_eq!(
             400,
@@ -63,7 +47,6 @@ async fn subscribe_returns_400_when_data_is_missing() {
 async fn subscribe_returns_400_when_fields_are_present_but_empty() {
     // Arrange
     let app = spawn_app().await;
-    let client = reqwest::Client::new();
     let test_cases = vec![
         ("name=&email=test_email%40test.com", "empty name"),
         ("name=test_name&email=", "empty email"),
@@ -71,14 +54,7 @@ async fn subscribe_returns_400_when_fields_are_present_but_empty() {
     ];
 
     for (body, description) in test_cases {
-        let response = client
-            .post(&format!("{}/subscriptions", &app.address))
-            .header("Content-Type", "application/x-www-form-urlencoded")
-            .body(body)
-            .send()
-            .await
-            .expect("Failed to execute request");
-
+        let response = app.post_subscriptions(body.into()).await;
         assert_eq!(
             400,
             response.status().as_u16(),

@@ -5,9 +5,16 @@ use wiremock::{Mock, ResponseTemplate};
 async fn subscribe_returns_200_for_valid_form_data() {
     // setup
     let app = spawn_app().await;
+    let body = "name=daniel%20borne&email=danielborne%40gmail.com";
+
+    Mock::given(path("/email"))
+        .and(method("POST"))
+        .respond_with(ResponseTemplate::new(200))
+        .expect(1)
+        .mount(&app.email_server)
+        .await;
 
     // act
-    let body = "name=daniel%20borne&email=danielborne%40gmail.com";
     let response = app.post_subscriptions(body.into()).await;
     // Assert response is correct
     assert_eq!(200, response.status().as_u16());

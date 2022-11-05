@@ -1,5 +1,6 @@
 application:
   port: 8000
+  host: 0.0.0.0
 database:
   host: "localhost"
   port: 5432
@@ -7,7 +8,7 @@ database:
   password: "password"
   database_name: "newsletter"
 email_client:
-  base_url: "localhost"
+  base_url: "http://localhost"
   sender_email: "test@gmail.com"
   authorization_token: "my-secret-token"
   timeout_milliseconds: 10000

@@ -47,19 +47,29 @@ pub async fn subscribe(
         Err(_) => HttpResponse::InternalServerError().finish(),
     };
 
-    // send the confirmaiton email
-    if email_client
-        .send_email(
-            new_subscriber.email,
-            "Welcome!",
-            "Welcome to my newsletter!",
-            "Welcome to my newsletter",
-        )
-        .await
-        .is_err()
-    {
+    let response = email_client
+        .send_email(new_subscriber.email, "welcome", "welcome", "welcome")
+        .await;
+
+    dbg!(&response);
+
+    if response.is_err() {
         return HttpResponse::InternalServerError().finish();
-    }
+    };
+
+    // send the confirmaiton email
+    // if email_client
+    //     .send_email(
+    //         new_subscriber.email,
+    //         "Welcome!",
+    //         "Welcome to my newsletter!",
+    //         "Welcome to my newsletter",
+    //     )
+    //     .await
+    //     .is_err()
+    // {
+    //     return HttpResponse::InternalServerError().finish();
+    // }
 
     HttpResponse::Ok().finish()
 }

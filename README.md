@@ -1,7 +1,7 @@
 # Welcome to my newsletter API
 
 After the completion of this API I will be integrating the project into my portfolio site which will be located at bornedj.me.
-The API and portfolio will allow me to share several of the projects I've been in the past few years as well as reach out to whomever is interested through a recurring newsletter.
+The API and portfolio will allow me to share several of the projects I've been working on in the past few years as well as reach out to whomever is interested through a recurring newsletter.
 
 ## This API was built with the guidance of Luca Palmieri's [Zero to Production In Rust](https://www.zero2prod.com/)
 

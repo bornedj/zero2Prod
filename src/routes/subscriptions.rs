@@ -35,6 +35,7 @@ pub async fn subscribe(
     form: web::Form<FormData>,
     pool: web::Data<PgPool>,
     email_client: web::Data<EmailClient>,
+    // base_url: web::Data<ApplicaitonBaseUrl>,
 ) -> HttpResponse {
     let new_subscriber = match form.0.try_into() {
         Ok(form) => form,
@@ -51,6 +52,7 @@ pub async fn subscribe(
         .send_email(new_subscriber.email, "welcome", "welcome", "welcome")
         .await;
 
+    // dbg!(&email_client);
     dbg!(&response);
 
     if response.is_err() {

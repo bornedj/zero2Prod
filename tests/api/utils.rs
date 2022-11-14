@@ -65,7 +65,7 @@ pub async fn spawn_app() -> TestApp {
         .expect("Failed to build application");
     // launching the server as a background task
     // using tokio spawn to return a handle of a future
-    let address = format!("http://127.0.0.1:{}", application.port());
+    let address = format!("http://localhost:{}", application.port());
     let _ = tokio::spawn(application.run_until_stopped());
 
     //return the address with the randomly assigned port to be used in the response check

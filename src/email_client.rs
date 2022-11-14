@@ -20,9 +20,9 @@ impl EmailClient {
     ) -> Self {
         let http_client = Client::builder().timeout(timeout).build().unwrap();
         Self {
+            sender,
             http_client,
             base_url,
-            sender,
             authorization_token,
         }
     }

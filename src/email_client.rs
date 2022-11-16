@@ -1,7 +1,6 @@
+use crate::domain::SubscriberEmail;
 use reqwest::Client;
 use secrecy::{ExposeSecret, Secret};
-
-use crate::domain::SubscriberEmail;
 
 #[derive(Debug)]
 pub struct EmailClient {
@@ -18,7 +17,14 @@ impl EmailClient {
         authorization_token: Secret<String>,
         timeout: std::time::Duration,
     ) -> Self {
-        let http_client = Client::builder().timeout(timeout).build().unwrap();
+        // let local_addr = std::net::IpAddr::from_str("192.168.56.1").unwrap();
+
+        // dbg!(local_addr);
+        let http_client = Client::builder()
+            .timeout(timeout)
+            // .local_address(std::net::IpAddr::from(local_addr))
+            .build()
+            .unwrap();
         Self {
             sender,
             http_client,

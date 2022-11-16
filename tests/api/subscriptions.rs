@@ -10,7 +10,6 @@ async fn subscribe_returns_200_for_valid_form_data() {
     Mock::given(path("/email"))
         .and(method("POST"))
         .respond_with(ResponseTemplate::new(200))
-        .expect(1)
         .mount(&app.email_server)
         .await;
 

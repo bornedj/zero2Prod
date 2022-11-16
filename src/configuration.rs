@@ -5,6 +5,7 @@ use sqlx::ConnectOptions;
 
 use crate::domain::SubscriberEmail;
 use crate::email_client::EmailClient;
+
 #[derive(serde::Deserialize, Clone)]
 pub struct Settings {
     pub database: DatabaseSettings,

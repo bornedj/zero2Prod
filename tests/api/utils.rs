@@ -27,6 +27,7 @@ static TRACING: Lazy<()> = Lazy::new(|| {
 
 pub struct TestApp {
     pub address: String,
+    pub port: u16,
     pub db_pool: PgPool,
     pub email_server: MockServer,
 }
@@ -55,6 +56,7 @@ pub async fn spawn_app() -> TestApp {
         let mut c = get_configuration().expect("Failed to read configuration");
         c.database.database_name = Uuid::new_v4().to_string();
         c.application.port = 0;
+        c.email_client.base_url = email_server.uri();
         c
     };
     configure_database(&configuration.database).await;
@@ -65,12 +67,13 @@ pub async fn spawn_app() -> TestApp {
         .expect("Failed to build application");
     // launching the server as a background task
     // using tokio spawn to return a handle of a future
-    let address = format!("http://localhost:{}", application.port());
+    let application_port = application.port();
     let _ = tokio::spawn(application.run_until_stopped());
 
     //return the address with the randomly assigned port to be used in the response check
     TestApp {
-        address,
+        address: format!("http://localhost:{}", application_port),
+        port: application_port,
         db_pool: get_connection_pool(&configuration.database),
         email_server,
     }

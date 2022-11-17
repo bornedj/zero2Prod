@@ -35,6 +35,8 @@ chrono = "0.4.15"
 #subscriber validation
 unicode-segmentation = "1"
 validator = "0.14"
+#rand for CSPRNG generation
+rand = {version = "0.8", features = ["std_rng"]}
 
 #tracing
 tracing = { version = "0.1", features = ["log"] }

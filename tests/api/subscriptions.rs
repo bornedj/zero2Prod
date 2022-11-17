@@ -1,4 +1,4 @@
-use crate::utils::spawn_app;
+use crate::utils::{spawn_app, ConfirmationLinks};
 use wiremock::matchers::{method, path};
 use wiremock::{Mock, ResponseTemplate};
 #[tokio::test]
@@ -129,4 +129,46 @@ async fn subscribe_sends_a_confirmation_email_with_link() {
     let confirmation_links = app.get_confirmation_links(&email_request);
 
     assert_eq!(confirmation_links.html, confirmation_links.plain_text);
+}
+
+#[tokio::test]
+async fn single_user_multi_subscription_sends_multiple_emails() {
+    // arrange
+    let app = spawn_app().await;
+    let body = "name=le%20guin&email=ursula_le_guin%40gmail.com";
+
+    // setup mock email server
+    Mock::given(path("/email"))
+        .and(method("POST"))
+        .respond_with(ResponseTemplate::new(200))
+        .mount(&app.email_server)
+        .await;
+
+    // send first request
+    let first_req = app.post_subscriptions(body.into()).await;
+    // send second request
+    let second_req = app.post_subscriptions(body.into()).await;
+
+    // assert
+    let email_requests = &app.email_server.received_requests().await.unwrap();
+    dbg!(first_req, second_req);
+    let confirmation_links: Vec<ConfirmationLinks> = email_requests
+        .iter()
+        .map(|req| {
+            return app.get_confirmation_links(req);
+        })
+        .collect();
+
+    // check that more than one request was received
+    assert_eq!(confirmation_links.len(), 2);
+
+    // assert that each emails confirmation links match
+    assert_eq!(confirmation_links[0].html, confirmation_links[0].plain_text);
+    assert_eq!(confirmation_links[1].html, confirmation_links[1].plain_text);
+
+    // check that the separate emails have different links via tokens
+    assert_ne!(
+        confirmation_links[0].plain_text,
+        confirmation_links[1].plain_text
+    );
 }

@@ -45,6 +45,7 @@ impl TestApp {
 }
 
 // structs and funcs for confirmation link logic
+#[derive(Debug)]
 pub struct ConfirmationLinks {
     pub html: reqwest::Url,
     pub plain_text: reqwest::Url,

@@ -51,10 +51,20 @@ pub async fn subscribe(
         Err(_) => return HttpResponse::InternalServerError().finish(),
     };
 
-    // run insert query
-    let subscriber_id = match insert_subscriber(&mut transaction, &new_subscriber).await {
-        Ok(subscriber_id) => subscriber_id,
+    // check if user has previously attempted to subscribe
+    let id_check = match query_submitted_email(&mut transaction, &new_subscriber).await {
+        Ok(id) => id,
         Err(_) => return HttpResponse::InternalServerError().finish(),
+    };
+
+    let subscriber_id = match id_check {
+        // if there isn't an email currently in the database, insert a new user
+        None => match insert_subscriber(&mut transaction, &new_subscriber).await {
+            Ok(subscriber_id) => subscriber_id,
+            Err(_) => return HttpResponse::InternalServerError().finish(),
+        },
+        // if there is a user associated with the email, return the ID for the new token
+        Some(id) => id,
     };
 
     let subscription_token = generate_subscription_token();
@@ -176,4 +186,27 @@ pub async fn store_token(
         e
     })?;
     Ok(())
+}
+
+// function may be moved later as it's utility could be used else where
+#[tracing::instrument(
+    name = "Check if email already exists in database",
+    skip(new_subscriber, transaction)
+)]
+pub async fn query_submitted_email(
+    transaction: &mut Transaction<'_, Postgres>,
+    new_subscriber: &NewSubscriber,
+) -> Result<Option<Uuid>, sqlx::Error> {
+    let result = sqlx::query!(
+        r#"SELECT id FROM subscriptions
+        WHERE email = $1"#,
+        new_subscriber.email.as_ref()
+    )
+    .fetch_optional(transaction)
+    .await
+    .map_err(|e| {
+        tracing::error!("Failed to execute query {:?}", e);
+        e
+    })?;
+    Ok(result.map(|r| r.id))
 }

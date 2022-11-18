@@ -145,13 +145,12 @@ async fn single_user_multi_subscription_sends_multiple_emails() {
         .await;
 
     // send first request
-    let first_req = app.post_subscriptions(body.into()).await;
+    app.post_subscriptions(body.into()).await;
     // send second request
-    let second_req = app.post_subscriptions(body.into()).await;
+    app.post_subscriptions(body.into()).await;
 
     // assert
     let email_requests = &app.email_server.received_requests().await.unwrap();
-    dbg!(first_req, second_req);
     let confirmation_links: Vec<ConfirmationLinks> = email_requests
         .iter()
         .map(|req| {

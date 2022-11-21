@@ -40,6 +40,7 @@ rand = {version = "0.8", features = ["std_rng"]}
 
 # error handling
 thiserror = "1"
+anyhow = "1"
 
 #tracing
 tracing = { version = "0.1", features = ["log"] }

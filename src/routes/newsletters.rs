@@ -1,6 +1,9 @@
+use crate::domain::SubscriberEmail;
+use crate::email_client::EmailClient;
 use crate::routes::error_chain_fmt;
 use actix_web::http::StatusCode;
 use actix_web::{web, HttpResponse, ResponseError};
+use anyhow::Context;
 use sqlx::PgPool;
 
 // error handling
@@ -25,32 +28,7 @@ impl ResponseError for PublishError {
 }
 
 struct ConfirmedSubscriber {
-    email: String,
-}
-
-#[tracing::instrument(name = "Get confirmed subscribers", skip(pool))]
-async fn get_confirmed_subscribers(
-    pool: &PgPool,
-) -> Result<Vec<ConfirmedSubscriber>, anyhow::Error> {
-    let rows = sqlx::query_as!(
-        ConfirmedSubscriber,
-        r#"
-        SELECT email
-        FROM subscriptions
-        WHERE status = 'confirmed'
-        "#
-    )
-    .fetch_all(pool)
-    .await?;
-    Ok(rows)
-}
-
-pub async fn publish_newsletter(
-    _body: web::Json<BodyData>,
-    pool: web::Data<PgPool>,
-) -> Result<HttpResponse, PublishError> {
-    let _subscribers = get_confirmed_subscribers(&pool).await?;
-    Ok(HttpResponse::Ok().finish())
+    email: SubscriberEmail,
 }
 
 #[derive(serde::Deserialize)]
@@ -63,4 +41,66 @@ pub struct BodyData {
 pub struct Content {
     html: String,
     text: String,
+}
+
+#[tracing::instrument(name = "Get confirmed subscribers", skip(pool))]
+async fn get_confirmed_subscribers(
+    pool: &PgPool,
+) -> Result<Vec<Result<ConfirmedSubscriber, anyhow::Error>>, anyhow::Error> {
+    struct Row {
+        email: String,
+    }
+    let rows = sqlx::query_as!(
+        Row,
+        r#"
+        SELECT email
+        FROM subscriptions
+        WHERE status = 'confirmed'
+        "#
+    )
+    .fetch_all(pool)
+    .await?;
+
+    // map to the domain type
+    let confirmed_subscribers = rows
+        .into_iter()
+        .map(|r| match SubscriberEmail::parse(r.email) {
+            Ok(email) => Ok(ConfirmedSubscriber { email }),
+            Err(error) => Err(anyhow::anyhow!(error)),
+        })
+        .collect();
+    Ok(confirmed_subscribers)
+}
+
+pub async fn publish_newsletter(
+    body: web::Json<BodyData>,
+    pool: web::Data<PgPool>,
+    email_client: web::Data<EmailClient>,
+) -> Result<HttpResponse, PublishError> {
+    let subscribers = get_confirmed_subscribers(&pool).await?;
+    for subscriber in subscribers {
+        match subscriber {
+            Ok(subscriber) => {
+                email_client
+                    .send_email(
+                        &subscriber.email,
+                        &body.title,
+                        &body.content.html,
+                        &body.content.text,
+                    )
+                    .await
+                    .with_context(|| {
+                        format!("Failed to send newsletter issue to {}.", subscriber.email)
+                    })?;
+            }
+            Err(error) => {
+                tracing::warn!(
+                    error.cause_chain = ?error,
+                    "Skipping a confirmed subscriber. \
+                    Their stored contact details are invalid"
+                )
+            }
+        }
+    }
+    Ok(HttpResponse::Ok().finish())
 }

@@ -8,8 +8,12 @@ pub struct QueryParams {
 pub async fn login_form(query: web::Query<QueryParams>) -> HttpResponse {
     let error_html = match query.0.error {
         None => "".into(),
-        Some(error_message) => format!("<p><i>{error_message}</i></p>"),
+        Some(error_message) => format!(
+            "<p><i>{}</i></p>",
+            htmlescape::encode_minimal(&error_message)
+        ),
     };
+    println!("{}", error_html);
     HttpResponse::Ok()
         .content_type(ContentType::html())
         .body(format!(
@@ -21,7 +25,7 @@ pub async fn login_form(query: web::Query<QueryParams>) -> HttpResponse {
     <title>Login</title>
   </head>
   <body>
-    {error_html}
+    {}
     <form action="/login" method="POST">
       <label
         >Username
@@ -35,7 +39,7 @@ pub async fn login_form(query: web::Query<QueryParams>) -> HttpResponse {
       <button type="submit">Login</button>
     </form>
   </body>
-</html>
-"#
+</html>"#,
+            error_html
         ))
 }

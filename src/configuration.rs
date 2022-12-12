@@ -31,6 +31,7 @@ pub struct ApplicationSettings {
     pub port: u16,
     pub host: String,
     pub base_url: String,
+    pub hmac_secret: Secret<String>,
 }
 
 /// Used to get the PgConnection::connect string from the database settings

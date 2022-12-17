@@ -23,8 +23,6 @@ tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
 serde = { version = "1", features = ["derive"]}
 serde-aux = "3"
 
-hex = "0.4"
-
 # setup the database on config yaml
 config = {version = "0.13", default-features = false, features = ["yaml"]}
 
@@ -47,8 +45,6 @@ argon2 = { version = "0.4", features = ["std"]}
 base64 = "0.13"
 urlencoding = "2"
 htmlescape = "0.3"
-hmac = { version = "0.12", features = ["std"]}
-sha2 = "0.10"
 
 #tracing
 tracing = { version = "0.1", features = ["log"] }
